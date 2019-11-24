@@ -1,18 +1,15 @@
 const fs = require("fs");
 const axios = require("axios");
-// const pdfkit = require("pdfkit");
 const inquirer = require("inquirer");
 const puppeteer = require("puppeteer");
 const genHTML = require("./generateHTML");
 
-//console.log(genHTML.colors);
-//console.log(genHTML.generateHTML);
 
 function init() {
     launchApp();
 }
 
-
+// function to launch entire application
 async function launchApp () {
 
     let username = await inquirer.prompt({
@@ -26,14 +23,10 @@ async function launchApp () {
         name: "color",
         choices: ['green', 'pink', 'blue', 'red']
     });
-    //console.log(username);
     let name = username.name;
-    //console.log(name);
     const queryUrl = `https://api.github.com/users/${name}`
     const starredQuery = `https://api.github.com/users/${name}/starred`
-    //console.log(queryUrl);
     let gitHubData = await getAPIResults(queryUrl, starredQuery);
-    // console.log(gitHubData);
 
     gitHubData.color = validateColor(color.color);
 
@@ -43,11 +36,12 @@ async function launchApp () {
     generatePDF(filename, html);
 }
 
+// function to get gitHub data and populate the output (object)
 async function getAPIResults (queryUrl, starredQuery) {
     let results = {};
     let data = await axios.get(queryUrl);
     let reposData = await axios.get(starredQuery); // call to get the stars 
-    //console.log(reposData);
+
     let starGazers = [];
     for (repo of reposData.data) {
         starGazers.push(repo.stargazers_count);
@@ -70,13 +64,13 @@ async function getAPIResults (queryUrl, starredQuery) {
         results.starsNum = 0;
     }
     results.followingNum = data.data.following;
-    //console.log(results);
+
     return results;
 }
 
+// function to check if the color selected actually exists in the presets
 function validateColor(color) {
-    console.log(genHTML.colors);
-    console.log(color);
+
     if (genHTML.colors.hasOwnProperty(color)) {
         return color;
     }
@@ -86,6 +80,7 @@ function validateColor(color) {
     }
 }
 
+// function to generate the pdf out of the html provided
 async function generatePDF(filename, html) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
