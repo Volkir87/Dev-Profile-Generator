@@ -21,8 +21,10 @@ async function launchApp () {
     });
     
     let color = await inquirer.prompt({
+        type: "list",
         message: "Input your favourite color",
-        name: "color"
+        name: "color",
+        choices: ['green', 'pink', 'blue', 'red']
     });
     //console.log(username);
     let name = username.name;
